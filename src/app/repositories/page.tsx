@@ -3,21 +3,27 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, TextField, Container, Typography, Grid } from "@mui/material";
 import { useGetRepositories } from "@/api/repositories";
 import Link from "next/link";
+import { Repository } from "@/api/repositories";
 
 const getFilterRepositories = (repositories: any, searchTerm: string) => {
-  console.log(searchTerm);
-  return repositories?.filter((repository: any) =>
-    repository.name.toLowerCase().includes(searchTerm.toLowerCase())
+  return repositories?.filter(
+    (repository: any) =>
+      repository.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      repository.owner.toLowerCase().includes(searchTerm.toLowerCase())
   );
 };
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: allRepositories } = useGetRepositories();
-  const [filteredRepositories, setFilteredRepositories] = useState([]);
+  const [filteredRepositories, setFilteredRepositories] = useState<
+    Repository[]
+  >([]);
 
   useEffect(() => {
-    setFilteredRepositories(allRepositories);
+    if (allRepositories) {
+      setFilteredRepositories(allRepositories);
+    }
   }, [allRepositories]);
 
   const handleSearch = useCallback(() => {
@@ -27,10 +33,6 @@ function App() {
   useEffect(() => {
     handleSearch();
   }, [searchTerm, handleSearch]);
-
-  if (!filteredRepositories) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div
@@ -44,6 +46,10 @@ function App() {
       <Typography variant="h4" gutterBottom>
         Repositories
       </Typography>
+
+      <div>
+        <Link href={"repositories/new"}>+ repository</Link>
+      </div>
       <div style={{ marginTop: "100px" }}>
         <TextField
           label="Search"
@@ -57,7 +63,7 @@ function App() {
         />
       </div>
       <div style={{ marginTop: "70px" }}>
-        {filteredRepositories.map((repository: any) => (
+        {filteredRepositories?.map((repository: any) => (
           <div key={repository.id}>
             <Link href={`repositories/${repository.id}`}>
               {repository.owner}/{repository.name}

@@ -13,7 +13,7 @@ const theme = createTheme({
 });
 // This implementation is from emotion-js
 // https://github.com/emotion-js/emotion/issues/2928#issuecomment-1319747902
-export default function ThemeRegistry(props) {
+export default function ThemeRegistry(props: any) {
   const { options, children } = props;
 
   const [{ cache, flush }] = React.useState(() => {
